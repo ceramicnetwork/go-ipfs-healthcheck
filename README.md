@@ -1,4 +1,4 @@
-# go-ipfs healthcheck plugin
+# go-ipfs-healthcheck
 
 **WIP**
 
