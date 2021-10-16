@@ -8,7 +8,7 @@ A plugin for [go-ipfs](https://github.com/ipfs/go-ipfs) that serves a healthchec
 
 This is a preloaded plugin built in-tree into go-ipfs when it's compiled.
 
-```
+```sh
 git clone https://github.com/ipfs/go-ipfs
 
 cd go-ipfs
@@ -29,7 +29,7 @@ make build
 # Usage
 
 Run IPFS and check its status.
-```
+```sh
 ./cmd/ipfs/ipfs
 curl -X GET http://localhost:8011
 ```
