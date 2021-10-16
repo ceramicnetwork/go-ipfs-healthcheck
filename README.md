@@ -1,15 +1,12 @@
-# go-ipfs healthcheck plugin
+# go-ipfs-healthcheck
 
 **WIP**
 
-This tiny go server plugs in to the go-ipfs daemon to allow healthchecks that return whether the IPFS instance is online or not.
+A plugin for [go-ipfs](https://github.com/ipfs/go-ipfs) that serves a healthcheck endpoint which returns the status of the IPFS node.
 
-# Installation and Usage
+# Installation
 
-```
-go build server.go
-./server
-```
+This is a preloaded plugin built in-tree into go-ipfs when it's compiled.
 
 ```
 git clone https://github.com/ipfs/go-ipfs
@@ -22,13 +19,20 @@ go get github.com/ceramicnetwork/go-ipfs-healthcheck/plugin@latest
 # Add the plugin to the [preload list](https://github.com/ipfs/go-ipfs/blob/master/docs/plugins.md#preloaded-plugins)
 echo "\nhealthcheck github.com/ceramicnetwork/go-ipfs-healthcheck/plugin 0" >> plugin/loader/preload_list
 
+# Download dependencies
 go mod download
 
-# Enable the plugin by including it in the IPFS_PLUGINS variable when building IPFS
-make build IPFS_PLUGINS="healthcheck"
+# Build go-ipfs with the plugin
+make build
 ```
 
-Visit `http://localhost:8080`
+# Usage
+
+Run IPFS and check its status.
+```
+./cmd/ipfs/ipfs
+curl -X GET http://localhost:8011
+```
 
 # Resources
 
@@ -41,4 +45,3 @@ Visit `http://localhost:8080`
 # License
 
 Fully open source and dual-licensed under MIT and Apache 2.
-
