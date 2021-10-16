@@ -11,6 +11,23 @@ go build server.go
 ./server
 ```
 
+```
+git clone https://github.com/ipfs/go-ipfs
+
+cd go-ipfs
+
+# Pull in the plugin (you can specify a version other than "latest" if you'd like)
+go get github.com/ceramicnetwork/go-ipfs-healthcheck/plugin@latest
+
+# Add the plugin to the [preload list](https://github.com/ipfs/go-ipfs/blob/master/docs/plugins.md#preloaded-plugins)
+echo "\nhealthcheck github.com/ceramicnetwork/go-ipfs-healthcheck/plugin 0" >> plugin/loader/preload_list
+
+go mod download
+
+# Enable the plugin by including it in the IPFS_PLUGINS variable when building IPFS
+make build IPFS_PLUGINS="healthcheck"
+```
+
 Visit `http://localhost:8080`
 
 # Resources
