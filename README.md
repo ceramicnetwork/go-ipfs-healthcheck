@@ -1,10 +1,10 @@
 # go-ipfs-healthcheck
 
-**NOTE: This currently works with go-ipfs version 0.8. Other versions have not been tested.**
+**NOTE: This currently works with go-ipfs version 0.8 and 0.10. Other versions have not been tested.**
 
 **TODO**
 
-- [ ] Compatiblity with go-ipfs 9 and 10
+- [ ] Compatiblity with go-ipfs 9
 - [ ] Use multiaddress for healthcheck endpoint
 
 A plugin for [go-ipfs](https://github.com/ipfs/go-ipfs) that serves a healthcheck endpoint which returns the status of the IPFS node.
