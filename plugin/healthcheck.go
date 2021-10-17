@@ -49,6 +49,8 @@ func (*HealthcheckPlugin) Init(env *plugin.Environment) error {
 }
 
 func (*HealthcheckPlugin) Start(ipfs coreiface.CoreAPI) error {
-	healthcheck.StartServer(port, ipfs)
+	go func() {
+		healthcheck.StartServer(port, ipfs)
+	}()
 	return nil
 }

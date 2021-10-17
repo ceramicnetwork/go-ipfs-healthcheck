@@ -7,14 +7,13 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/ipfs/go-cid"
 	coreiface "github.com/ipfs/interface-go-ipfs-core"
 )
-
-type Config struct {
-	port string
-}
 
 type ServerContext struct {
 	ipfs coreiface.CoreAPI
@@ -29,10 +28,35 @@ type status struct {
 }
 
 func StartServer(port string, ipfs coreiface.CoreAPI) {
+	var server http.Server
+	server.Addr = ":" + port
+
 	ctx := ServerContext{ipfs}
 	http.HandleFunc("/", createHandler(healthcheckHandler, ctx))
-	fmt.Println("Healthcheck server listening on port ", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+
+	// Shutdown gracefully
+
+	idleConnsClosed := make(chan struct{})
+
+	go func() {
+		sigint := make(chan os.Signal, 1)
+		signal.Notify(sigint, os.Interrupt)
+		signal.Notify(sigint, syscall.SIGTERM)
+		<-sigint
+
+		fmt.Println("Healthcheck server shutting down...")
+		close(idleConnsClosed)
+		if err := server.Shutdown(context.Background()); err != nil {
+			log.Printf("Healthcheck server error on Shutdown: %v", err)
+		}
+	}()
+
+	fmt.Println("Healthcheck server listening on port", port)
+	if err := server.ListenAndServe(); err != http.ErrServerClosed {
+		log.Printf("Healthcheck server error on ListenAndServe: %v", err)
+	}
+
+	<-idleConnsClosed
 }
 
 func createHandler(
