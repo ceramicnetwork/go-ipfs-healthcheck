@@ -30,7 +30,7 @@ make build
 
 Run IPFS and check its status.
 ```sh
-./cmd/ipfs/ipfs
+./cmd/ipfs/ipfs daemon
 curl -X GET http://localhost:8011
 ```
 
