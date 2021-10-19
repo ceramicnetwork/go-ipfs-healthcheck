@@ -28,8 +28,9 @@ type status struct {
 }
 
 func StartServer(port string, ipfs coreiface.CoreAPI) {
-	var server http.Server
-	server.Addr = ":" + port
+	server := http.Server{
+		Addr: ":" + port,
+	}
 
 	ctx := ServerContext{ipfs}
 	http.HandleFunc("/", createHandler(ctx, healthcheckHandler))

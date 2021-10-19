@@ -2,7 +2,6 @@
 package plugin
 
 import (
-	"errors"
 	"os"
 
 	healthcheck "github.com/ceramicnetwork/go-ipfs-healthcheck"
@@ -38,16 +37,11 @@ func (*HealthcheckPlugin) Init(env *plugin.Environment) error {
 		return nil
 	}
 
-	cfg, ok := env.Config.(map[string]interface{})
-	if !ok {
-		return errors.New("env config not in known format")
+	if cfg, ok := env.Config.(map[string]interface{}); ok {
+		if cfgPort, ok := cfg["port"].(string); ok {
+			port = cfgPort
+		}
 	}
-
-	cfgPort, ok := cfg["port"].(string)
-	if !ok {
-		return errors.New("could not get port from env config")
-	}
-	port = cfgPort
 
 	return nil
 }
