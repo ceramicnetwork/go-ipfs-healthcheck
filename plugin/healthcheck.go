@@ -15,8 +15,9 @@ var Plugins = []plugin.PluginDaemon{
 
 type HealthcheckPlugin struct{}
 
+const portEnvVar = "HEALTHCHECK_PORT"
+
 var port = "8011"
-var portEnvVar = "HEALTHCHECK_PORT"
 
 // Name returns the plugin's name, satisfying the plugin.Plugin interface.
 func (*HealthcheckPlugin) Name() string {
@@ -30,18 +31,15 @@ func (*HealthcheckPlugin) Version() string {
 
 // Init initializes plugin, satisfying the plugin.Plugin interface.
 func (*HealthcheckPlugin) Init(env *plugin.Environment) error {
-	_port := os.Getenv(portEnvVar)
-	if _port != "" {
-		port = _port
+	envPort := os.Getenv(portEnvVar)
+	if envPort != "" {
+		port = envPort
 		return nil
 	}
 
-	cfg, ok := env.Config.(map[string]interface{})
-	if ok {
-		_port, ok := cfg["port"].(string)
-		if ok {
-			port = _port
-			return nil
+	if cfg, ok := env.Config.(map[string]interface{}); ok {
+		if cfgPort, ok := cfg["port"].(string); ok {
+			port = cfgPort
 		}
 	}
 

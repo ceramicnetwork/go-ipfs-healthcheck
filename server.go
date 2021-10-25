@@ -28,11 +28,12 @@ type status struct {
 }
 
 func StartServer(port string, ipfs coreiface.CoreAPI) {
-	var server http.Server
-	server.Addr = ":" + port
+	server := http.Server{
+		Addr: ":" + port,
+	}
 
 	ctx := ServerContext{ipfs}
-	http.HandleFunc("/", createHandler(healthcheckHandler, ctx))
+	http.HandleFunc("/", createHandler(ctx, healthcheckHandler))
 
 	// Shutdown gracefully
 
@@ -47,30 +48,30 @@ func StartServer(port string, ipfs coreiface.CoreAPI) {
 		fmt.Println("Healthcheck server shutting down...")
 		close(idleConnsClosed)
 		if err := server.Shutdown(context.Background()); err != nil {
-			log.Printf("Healthcheck server error on Shutdown: %v", err)
+			log.Printf("Healthcheck server error on Shutdown: %+v", err)
 		}
 	}()
 
 	fmt.Println("Healthcheck server listening on port", port)
 	if err := server.ListenAndServe(); err != http.ErrServerClosed {
-		log.Printf("Healthcheck server error on ListenAndServe: %v", err)
+		log.Printf("Healthcheck server error on ListenAndServe: %+v", err)
 	}
 
 	<-idleConnsClosed
 }
 
 func createHandler(
-	fn func(http.ResponseWriter, *http.Request),
 	ctx ServerContext,
+	fn func(http.ResponseWriter, *http.Request),
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		_ctx := context.WithValue(
+		updatedCtx := context.WithValue(
 			r.Context(),
 			ipfsServerContextKey{"ipfs"},
 			ctx.ipfs,
 		)
-		_r := r.Clone(_ctx)
-		fn(w, _r)
+		updatedRequest := r.Clone(updatedCtx)
+		fn(w, updatedRequest)
 	}
 }
 
@@ -82,8 +83,8 @@ func healthcheckHandler(w http.ResponseWriter, r *http.Request) {
 		log.Panic(err)
 	}
 
-	var failed bool = false
-	var _status *status
+	var failed = false
+	var healthCheck *status
 
 	ctx := r.Context()
 	ipfs, _ := ctx.Value(ipfsServerContextKey{"ipfs"}).(coreiface.CoreAPI)
@@ -99,10 +100,10 @@ func healthcheckHandler(w http.ResponseWriter, r *http.Request) {
 
 	if failed {
 		w.WriteHeader(http.StatusInternalServerError)
-		_status = &status{Message: "Health check failed"}
+		healthCheck = &status{Message: "Health check failed"}
 	} else {
-		_status = &status{Message: "Health check succeeded"}
+		healthCheck = &status{Message: "Health check succeeded"}
 	}
 
-	fmt.Fprintf(w, _status.Message)
+	_, _ = fmt.Fprintf(w, healthCheck.Message)
 }
