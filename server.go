@@ -7,14 +7,13 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/ipfs/go-cid"
 	coreiface "github.com/ipfs/interface-go-ipfs-core"
 )
-
-type Config struct {
-	port string
-}
 
 type ServerContext struct {
 	ipfs coreiface.CoreAPI
@@ -29,24 +28,50 @@ type status struct {
 }
 
 func StartServer(port string, ipfs coreiface.CoreAPI) {
+	server := http.Server{
+		Addr: ":" + port,
+	}
+
 	ctx := ServerContext{ipfs}
-	http.HandleFunc("/", createHandler(healthcheckHandler, ctx))
-	fmt.Println("Healthcheck server listening on port ", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	http.HandleFunc("/", createHandler(ctx, healthcheckHandler))
+
+	// Shutdown gracefully
+
+	idleConnsClosed := make(chan struct{})
+
+	go func() {
+		sigint := make(chan os.Signal, 1)
+		signal.Notify(sigint, os.Interrupt)
+		signal.Notify(sigint, syscall.SIGTERM)
+		<-sigint
+
+		fmt.Println("Healthcheck server shutting down...")
+		close(idleConnsClosed)
+		if err := server.Shutdown(context.Background()); err != nil {
+			log.Printf("Healthcheck server error on Shutdown: %+v", err)
+		}
+	}()
+
+	fmt.Println("Healthcheck server listening on port", port)
+	if err := server.ListenAndServe(); err != http.ErrServerClosed {
+		log.Printf("Healthcheck server error on ListenAndServe: %+v", err)
+	}
+
+	<-idleConnsClosed
 }
 
 func createHandler(
-	fn func(http.ResponseWriter, *http.Request),
 	ctx ServerContext,
+	fn func(http.ResponseWriter, *http.Request),
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		_ctx := context.WithValue(
+		updatedCtx := context.WithValue(
 			r.Context(),
 			ipfsServerContextKey{"ipfs"},
 			ctx.ipfs,
 		)
-		_r := r.Clone(_ctx)
-		fn(w, _r)
+		updatedRequest := r.Clone(updatedCtx)
+		fn(w, updatedRequest)
 	}
 }
 
@@ -58,8 +83,8 @@ func healthcheckHandler(w http.ResponseWriter, r *http.Request) {
 		log.Panic(err)
 	}
 
-	var failed bool = false
-	var _status *status
+	var failed = false
+	var healthCheck *status
 
 	ctx := r.Context()
 	ipfs, _ := ctx.Value(ipfsServerContextKey{"ipfs"}).(coreiface.CoreAPI)
@@ -75,10 +100,10 @@ func healthcheckHandler(w http.ResponseWriter, r *http.Request) {
 
 	if failed {
 		w.WriteHeader(http.StatusInternalServerError)
-		_status = &status{Message: "Health check failed"}
+		healthCheck = &status{Message: "Health check failed"}
 	} else {
-		_status = &status{Message: "Health check succeeded"}
+		healthCheck = &status{Message: "Health check succeeded"}
 	}
 
-	fmt.Fprintf(w, _status.Message)
+	_, _ = fmt.Fprintf(w, healthCheck.Message)
 }

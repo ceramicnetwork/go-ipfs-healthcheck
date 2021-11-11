@@ -2,9 +2,7 @@
 package plugin
 
 import (
-	"fmt"
 	"os"
-	"reflect"
 
 	healthcheck "github.com/ceramicnetwork/go-ipfs-healthcheck"
 	"github.com/ipfs/go-ipfs/plugin"
@@ -17,8 +15,9 @@ var Plugins = []plugin.PluginDaemon{
 
 type HealthcheckPlugin struct{}
 
+const portEnvVar = "HEALTHCHECK_PORT"
+
 var port = "8011"
-var portEnvVar = "HEALTHCHECK_PORT"
 
 // Name returns the plugin's name, satisfying the plugin.Plugin interface.
 func (*HealthcheckPlugin) Name() string {
@@ -32,24 +31,24 @@ func (*HealthcheckPlugin) Version() string {
 
 // Init initializes plugin, satisfying the plugin.Plugin interface.
 func (*HealthcheckPlugin) Init(env *plugin.Environment) error {
-	maybePort := os.Getenv(portEnvVar)
-	if maybePort != "" {
-		port = maybePort
+	envPort := os.Getenv(portEnvVar)
+	if envPort != "" {
+		port = envPort
 		return nil
 	}
 
-	val := reflect.ValueOf(env.Config).Elem()
-	_port, ok := val.FieldByName("port").Interface().(string)
-	if !ok {
-		fmt.Println("Healthcheck plugin is defaulting to port " + port)
-	} else {
-		port = _port
+	if cfg, ok := env.Config.(map[string]interface{}); ok {
+		if cfgPort, ok := cfg["port"].(string); ok {
+			port = cfgPort
+		}
 	}
 
 	return nil
 }
 
 func (*HealthcheckPlugin) Start(ipfs coreiface.CoreAPI) error {
-	healthcheck.StartServer(port, ipfs)
+	go func() {
+		healthcheck.StartServer(port, ipfs)
+	}()
 	return nil
 }
