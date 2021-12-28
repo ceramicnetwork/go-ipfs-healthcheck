@@ -1,5 +1,7 @@
 # go-ipfs-healthcheck
 
+A plugin for [go-ipfs](https://github.com/ipfs/go-ipfs) that serves a healthcheck endpoint which returns the status of the IPFS node.
+
 # Installation
 
 This is a preloaded plugin built in-tree into go-ipfs when it's compiled.
@@ -37,8 +39,6 @@ curl -X GET http://localhost:8011
 # Future work
 
 - [ ] Use `ipfs dag stat` for healthcheck endpoint (See https://github.com/ipfs/go-ipfs/pull/8429/files)
-
-A plugin for [go-ipfs](https://github.com/ipfs/go-ipfs) that serves a healthcheck endpoint which returns the status of the IPFS node.
 
 # Resources
 
