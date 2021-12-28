@@ -29,6 +29,10 @@ go mod download
 
 # Build go-ipfs with the plugin
 make build
+
+# If an error occurs, try
+go mod tidy
+make build
 ```
 
 # Usage
