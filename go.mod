@@ -1,4 +1,4 @@
-module github.com/ceramicnetwork/go-ipfs-healthcheck
+module github.com/ukstv/go-ipfs-healthcheck
 
 go 1.15
 
