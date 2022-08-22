@@ -1,13 +1,13 @@
 # go-ipfs-healthcheck
 
-A plugin for [go-ipfs](https://github.com/ipfs/go-ipfs) that serves a healthcheck endpoint which returns the status of the IPFS node.
+A plugin for [kubo](https://github.com/ipfs/kubo) that serves a healthcheck endpoint which returns the status of the IPFS node.
 
 # Installation
 
 This is a preloaded plugin built in-tree into go-ipfs when it's compiled.
 
 ```sh
-git clone https://github.com/ipfs/go-ipfs
+git clone https://github.com/ipfs/kubo
 
 cd go-ipfs
 
