@@ -4,7 +4,7 @@ package plugin
 import (
 	"os"
 
-	healthcheck "github.com/ukstv/go-ipfs-healthcheck"
+	healthcheck "github.com/ceramicnetwork/go-ipfs-healthcheck"
 	"github.com/ipfs/kubo/plugin"
 	coreiface "github.com/ipfs/interface-go-ipfs-core"
 )
