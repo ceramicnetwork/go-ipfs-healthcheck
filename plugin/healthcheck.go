@@ -5,7 +5,7 @@ import (
 	"os"
 
 	healthcheck "github.com/ceramicnetwork/go-ipfs-healthcheck"
-	"github.com/ipfs/go-ipfs/plugin"
+	"github.com/ipfs/kubo/plugin"
 	coreiface "github.com/ipfs/interface-go-ipfs-core"
 )
 

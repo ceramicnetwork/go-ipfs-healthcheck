@@ -1,15 +1,15 @@
 # go-ipfs-healthcheck
 
-A plugin for [go-ipfs](https://github.com/ipfs/go-ipfs) that serves a healthcheck endpoint which returns the status of the IPFS node.
+A plugin for [kubo](https://github.com/ipfs/kubo) that serves a healthcheck endpoint which returns the status of the IPFS node.
 
 # Installation
 
 This is a preloaded plugin built in-tree into go-ipfs when it's compiled.
 
 ```sh
-git clone https://github.com/ipfs/go-ipfs
+git clone https://github.com/ipfs/kubo
 
-cd go-ipfs
+cd kubo
 
 # Pull in the plugin (you can specify a version other than "latest" if you'd like)
 go get github.com/ceramicnetwork/go-ipfs-healthcheck/plugin@latest
@@ -30,7 +30,7 @@ make build
 
 # Usage
 
-Run IPFS and check its status.
+Run Kubo IPFS node and check its status.
 ```sh
 ./cmd/ipfs/ipfs daemon
 curl -X GET http://localhost:8011
@@ -42,7 +42,7 @@ curl -X GET http://localhost:8011
 
 # Resources
 
-[go-ipfs Plugins](https://github.com/ipfs/go-ipfs/blob/master/docs/plugins.md)
+[Kubo Plugins](https://github.com/ipfs/kubo/blob/master/docs/plugins.md)
 
 # Maintainers
 
