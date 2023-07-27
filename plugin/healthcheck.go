@@ -5,8 +5,8 @@ import (
 	"os"
 
 	healthcheck "github.com/ceramicnetwork/go-ipfs-healthcheck"
-	"github.com/ipfs/kubo/plugin"
 	coreiface "github.com/ipfs/interface-go-ipfs-core"
+	"github.com/ipfs/kubo/plugin"
 )
 
 var Plugins = []plugin.PluginDaemon{
